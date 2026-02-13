@@ -1,7 +1,30 @@
 /**
  * Cloudflare Worker: AI Running Coach (coach.gios.blog)
- * Phase 4.1: UX Fix - Initial 12-week plan automatically scrolls to TOP.
+ * Phase 5.1: Cleaned up UI (Removed top nav, added footer tool links).
  */
+
+const BANNER_POOL = [
+  {
+    link: 'https://link.coupang.com/a/dCrdiR', 
+    text: '⌚️ 페이스/고도 측정의 필수품',
+    sub: '가민(Garmin) GPS 워치 최저가 확인하기'
+  },
+  {
+    link: 'https://link.coupang.com/a/dyj430', 
+    text: '⚡️ 장거리 산행/러닝 에너지 보급',
+    sub: '에너지젤 로켓배송'
+  },
+  {
+    link: 'https://link.coupang.com/a/dCreW3', 
+    text: '🦵 하산할 때 무릎이 걱정된다면?',
+    sub: '잠스트 무릎 보호대'
+  },
+  {
+    link: 'https://link.coupang.com/a/dCrhi0', 
+    text: '🎒 트레일러닝 조끼/배낭 모음',
+    sub: '살로몬/카멜백 베스트셀러 구경하기'
+  }
+];
 
 export default {
   async fetch(request, env) {
@@ -71,6 +94,8 @@ export default {
     }
 
     // --- 프론트엔드 UI (GET) ---
+    const randomBanner = BANNER_POOL[Math.floor(Math.random() * BANNER_POOL.length)];
+
     const html = `
       <!DOCTYPE html>
       <html lang="ko">
@@ -83,9 +108,13 @@ export default {
           body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; line-height: 1.6; }
           .container { max-width: 650px; margin: 0 auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
           
-          header { text-align: center; margin-bottom: 30px; }
+          header { text-align: center; margin-bottom: 25px; }
           h1 { margin: 0; font-size: 2rem; color: #166534; letter-spacing: -0.5px; }
           .subtitle { color: var(--gray); font-size: 1rem; margin-top: 5px; }
+
+          /* 쿠팡 배너 스타일 */
+          .ad-banner { display: block; background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; text-decoration: none; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 25px; transition: transform 0.2s; }
+          .ad-banner:hover { transform: translateY(-2px); }
 
           .section-title { font-size: 1.1rem; font-weight: bold; margin: 25px 0 10px 0; color: #1e293b; }
           
@@ -97,7 +126,6 @@ export default {
           .input-field { width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1.05rem; font-family: inherit; outline: none; background: white; color: var(--text); cursor: pointer; box-sizing: border-box; }
           .input-field:focus { border-color: var(--primary); }
 
-          /* 트레일러닝 입력폼 플렉스 */
           .flex-inputs { display: flex; gap: 10px; }
 
           .submit-btn {
@@ -129,15 +157,36 @@ export default {
           
           .reset-btn { display: block; text-align: center; color: var(--gray); margin-top: 20px; text-decoration: none; font-size: 0.9rem; font-weight: bold; cursor: pointer; border: none; background: none; width: 100%; }
           .reset-btn:hover { color: var(--text); }
+
+          /* [추가] 하단 패밀리 링크 (도구 모음) */
+          .footer-links {
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 50px; margin-bottom: 20px;
+          }
+          .footer-links a {
+            background: white; color: var(--gray); padding: 8px 16px; border-radius: 20px; 
+            text-decoration: none; font-size: 0.85rem; font-weight: 600; 
+            border: 1px solid #e2e8f0; transition: all 0.2s;
+          }
+          .footer-links a:hover {
+            color: var(--primary); border-color: var(--primary); background: var(--bg); transform: translateY(-2px);
+          }
+
+          .footer-disclaimer { text-align: center; font-size: 0.8rem; color: #94a3b8; margin-top: 10px; }
         </style>
       </head>
       <body>
 
         <div class="container" id="mainContainer">
+          
           <header>
             <h1>🏃‍♂️ AI 러닝 코치</h1>
             <p class="subtitle">나의 상태를 선택하고 맞춤형 훈련 플랜을 받아보세요.</p>
           </header>
+
+          <a href="${randomBanner.link}" target="_blank" class="ad-banner">
+            ${randomBanner.text}<br>
+            <span style="font-size:0.85rem; opacity:0.8;">${randomBanner.sub}</span>
+          </a>
 
           <div id="formSection">
             <div class="section-title">🎯 이번 훈련의 목표는 무엇인가요?</div>
@@ -199,6 +248,17 @@ export default {
             </div>
             <button class="reset-btn" onclick="location.reload()">처음부터 다시 설정하기 ↺</button>
           </div>
+
+          <div class="footer-links">
+            <a href="https://gpx.gios.blog">⛰️ GPX 분석기</a>
+            <a href="https://checklist.gios.blog">🎒 대회 준비물 체크</a>
+            <a href="https://predict.gios.blog">⏱️ 기록 예측기</a>
+            <a href="https://utmb-races.gios.blog">🏔️ UTMB 대회 정보</a>
+          </div>
+
+          <footer class="footer-disclaimer">
+            이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+          </footer>
 
         </div>
 
@@ -278,11 +338,9 @@ export default {
             document.getElementById('formSection').style.display = 'none';
             document.getElementById('chatSection').style.display = 'block';
             
-            // 화면을 최상단으로 부드럽게 올림 (UX 개선)
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
             const initialQuestion = "위의 정보를 바탕으로 나만을 위한 구체적인 12주 훈련 계획표를 짜주세요.";
-            // 첫 질문일 경우 isInitial=true를 전달
             await askAI(initialQuestion, true);
           }
 
@@ -300,7 +358,6 @@ export default {
             await askAI(text, false);    
           }
 
-          // [수정] 첫 번째 응답일 때는 스크롤을 맨 위로 고정하는 로직 추가
           function appendMessage(role, htmlContent, isInitial = false) {
             const chatBox = document.getElementById('chatBox');
             const div = document.createElement('div');
@@ -309,10 +366,8 @@ export default {
             chatBox.appendChild(div);
             
             if (isInitial) {
-              // 최초 12주 플랜은 위에서부터 읽을 수 있도록 스크롤을 맨 위로 고정
               chatBox.scrollTop = 0;
             } else {
-              // 일반적인 채팅은 최신 글(맨 아래)로 자동 스크롤
               chatBox.scrollTop = chatBox.scrollHeight; 
             }
             return div; 
@@ -354,7 +409,6 @@ export default {
               if (!response.ok) throw new Error(data.error || "서버 오류");
 
               loadingBubble.remove();
-              // 결과 메세지 띄울 때 isInitial 속성 전달하여 스크롤 위치 제어
               appendMessage('model', data.reply, isInitial);
 
               chatHistory.push({ role: 'user', content: questionText });
